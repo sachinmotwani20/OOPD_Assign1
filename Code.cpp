@@ -1,21 +1,20 @@
-/*This is a generic code*/
+/*Software to estimate the value of money invested at any point of time beyond 1960: Compound Interest*/
 
 #include <iostream> //To use cout and cin
 #include <string> //To use string
 #include <fstream> //To read from file
 #include <sstream> //To use stringstream
-#include <cmath> //To use pow()
 #include <iomanip> //To use setprecision
 #include <limits> //To use numeric_limits
 #include <cctype> //To use isdigit()
-#include <windows.h> //To use delay() in windows [Alternative: #include <unistd.h> for linux]
+#include <windows.h> //To use Sleep() in windows 
 
 using namespace std;
 
 int main(){
     //Variable declarations
-    string original_path=" "; //Update path of the original csv file 
-    string path=" "; //Update path of the modified csv file
+    string original_path="D:\\OOPD\\Assig1\\Data\\india_data.csv"; //Path of the original csv file 
+    string path="D:\\OOPD\\Assig1\\Data\\india_data_modified.csv"; //Path of the modified csv file
     float principal=0, amount=0, value=0, interest=0;
     int year=1960, current_year=2023, choice=1;
     bool should_continue=true;
@@ -41,7 +40,11 @@ int main(){
 
     restart: //Label to restart the program
     
-    cout<<"Select the correct choice"<<endl;
+    Sleep(1000); //Delay for 1 second
+    cout<<"-------------------------------------------------"<<endl;
+    cout<<"Welcome to Indian Bank Investment Software"<<endl;
+    cout<<"-------------------------------------------------"<<endl;
+    cout<<"What would you like to do?"<<endl;
     cout<<"1. View changing Interest and Inflation Rates for your country between 1960 & 2022"<<endl;
     cout<<"2. Calculate the amount of money received as of the current year ("<<current_year<<")"<<endl;
     cout<<"3. Calculate the value [amount with inflation adjustment] of money received as of the current year ("<<current_year<<")"<<endl;
@@ -59,16 +62,16 @@ int main(){
             Remove_Header_Row(original_path, path); // Remove header row from the csv file
             amount = Calculate_Amount(principal, year, current_year, path); // Calculate amount without inflation adjustment
             cout.setf(ios::fixed); //To set the precision after the decimal point
-            cout<<"Amount ( ) received: "<<setprecision(2)<<amount<<endl;
-            cout<<"Interest  received on amount: "<<setprecision(2)<<(amount - principal)<<endl;
+            cout<<"Amount (INR) received: "<<setprecision(2)<<amount<<endl;
+            cout<<"Interest (INR) received on amount: "<<setprecision(2)<<(amount - principal)<<endl;
             Exit_Protocol(); // Exit the program
     case 3: Take_Inputs(principal, year, current_year, should_continue); // Take inputs from the user
             if (should_continue==false){goto restart;} //Restart the program
             Remove_Header_Row(original_path, path); // Remove header row from the csv file
             value = Calculate_Value(principal, year, current_year, path); // Calculate value with inflation adjustment
             cout.setf(ios::fixed); //To set the precision after the decimal point
-            cout<<"Value  received: "<<setprecision(2)<<value<<endl;
-            cout<<"Interest  received on value: "<<setprecision(2)<<(value - principal)<<endl;
+            cout<<"Value (INR) received: "<<setprecision(2)<<value<<endl;
+            cout<<"Interest (INR) received on value: "<<setprecision(2)<<(value - principal)<<endl;
             Exit_Protocol(); // Exit the program
     case 4: Take_Inputs(principal, year, current_year, should_continue); // Take inputs from the user
             if (should_continue==false){goto restart;} //Restart the program
@@ -76,10 +79,10 @@ int main(){
             amount = Calculate_Amount(principal, year, current_year, path); // Calculate amount without inflation adjustment
             value = Calculate_Value(principal, year, current_year, path); // Calculate value with inflation adjustment
             cout.setf(ios::fixed); //To set the precision after the decimal point
-            cout<<"Amount  received: "<<setprecision(2)<<amount<<endl;
-            cout<<"Interest  received on amount: "<<setprecision(2)<<(amount - principal)<<endl;
-            cout<<"Value  received: "<<setprecision(2)<<value<<endl;
-            cout<<"Interest  received on value: "<<setprecision(2)<<(value - principal)<<endl;
+            cout<<"Amount (INR) received: "<<setprecision(2)<<amount<<endl;
+            cout<<"Interest (INR) received on amount: "<<setprecision(2)<<(amount - principal)<<endl;
+            cout<<"Value (INR) received: "<<setprecision(2)<<value<<endl;
+            cout<<"Interest (INR) received on value: "<<setprecision(2)<<(value - principal)<<endl;
             Exit_Protocol(); // Exit the program
     case 5: Update_Current_Year(current_year); // Update current year
             goto restart; //Restart the program
@@ -90,6 +93,7 @@ int main(){
 
     return 0;
 }
+
 
 
 // Function definitions
@@ -123,7 +127,7 @@ bool Is_Valid_Choice(string& input){
     }
 
     int value = stoi(input);
-    return ((value > 0) && (value<6)); // Check if value is greater than 0 and less than 4
+    return ((value > 0) && (value<6)); // Check if value is greater than 0 and less than 6
 
 }
 
@@ -185,7 +189,7 @@ void Print_Interest_and_Inflation_Rate(string& path){
 
     string row; //To store the row read from the file
     while (getline(input_file, row)) { 
-        // cout<<"came inside loop"<<endl;
+
         int serial_no, year;
         string temp_string=""; //Empty string for temporarily storing non-string data types
 
@@ -227,20 +231,20 @@ bool Is_Valid_Principal(string& input) {
             decimal_count++;
             if (decimal_count > 1) {
                 cout<<"More than one decimal point found."<<endl;
-                return false; // More than one decimal point
+                return false; 
             }
         } else if (c == '-') {
             cout<<"Negative principal amount found."<<endl;
-            return false; // Negative principal amount      
+            return false;       
         } else {
             cout<<"Invalid character(s) found."<<endl;
-            return false; // Invalid character found
+            return false; 
         }
     }
 
     if (!digit_found) {
         cout<<"No digits found."<<endl;
-        return false; // No digits found
+        return false; 
     }
 
     float value = stof(input);
@@ -251,7 +255,7 @@ bool Is_Valid_Principal(string& input) {
 float Get_Valid_Principal() {
     string invested_amount;
     while (true) {
-        cout << "Amount  invested: ";
+        cout << "Amount (INR) invested: ";
         getline(cin, invested_amount); 
         /*getline() is used to read the entire line of input, including spaces and newline characters. 
         Unlike cin, it does not skip whitespace characters.*/
@@ -313,7 +317,6 @@ int Get_Valid_Year() {
 void Take_Inputs(float& principal, int& year, int& current_year, bool& should_continue){
     cout<<"------------------------------------------------"<<endl;
     cout<<"Please enter the following details"<<endl;
-    // cout<<"Amount  invested: ";
     principal = Get_Valid_Principal(); // Get valid principal amount
     year = Get_Valid_Year(); // Get valid year of investment
     if (year>current_year){
@@ -322,13 +325,13 @@ void Take_Inputs(float& principal, int& year, int& current_year, bool& should_co
     }
     else if (year==current_year){
         cout<<"Year of investment is equal to current year."<<endl;
-        cout<<"Amount  received: "<<principal<<endl;
+        cout<<"Amount (INR) received: "<<principal<<endl;
         cout<<"No interest received."<<endl;
         should_continue = false;
     }
     else{
         cout<<"------------------------------------------------"<<endl;
-        cout<<"Amount  invested: "<<principal<<endl;
+        cout<<"Amount (INR) invested: "<<principal<<endl;
         cout<<"Year of Investment: "<<year<<endl;
         cout<<"Current year: "<<current_year<<endl;
         should_continue = true;
@@ -370,13 +373,13 @@ float Get_Interest_Rate(int year, string& path){
         stringstream input_string(row); //To parse the data read into the string
         
         getline(input_string, temp_string, ','); 
-        serial_no = stoi(temp_string); //stoi() converts string to int
+        serial_no = stoi(temp_string); 
         
         getline(input_string, temp_string, ',');
         temp_year = stoi(temp_string); 
 
         getline(input_string, temp_string, ',');
-        float interest_rate = stof(temp_string); //stof() converts string to float
+        float interest_rate = stof(temp_string); 
         
         getline(input_string, temp_string, ',');
         float inflation_rate = stof(temp_string); 
@@ -398,24 +401,24 @@ float Calculate_Amount(float principal, int year, int current_year, string& path
 }
 
 float Get_Inflation_Rate(int year, string& path){
-    ifstream input_file; //Create an input file stream
-    input_file.open(path); //Open the file
+    ifstream input_file; 
+    input_file.open(path); 
     
-    string row; //To store the row read from the file
+    string row; 
     while (getline(input_file, row)) { 
         int serial_no, temp_year;
-        string temp_string=""; //Empty string for temporarily storing non-string data types
+        string temp_string=""; 
 
-        stringstream input_string(row); //To parse the data read into the string
+        stringstream input_string(row); 
         
         getline(input_string, temp_string, ','); 
-        serial_no = stoi(temp_string); //stoi() converts string to int
+        serial_no = stoi(temp_string); 
         
         getline(input_string, temp_string, ',');
         temp_year = stoi(temp_string); 
 
         getline(input_string, temp_string, ',');
-        float interest_rate = stof(temp_string); //stof() converts string to float
+        float interest_rate = stof(temp_string); 
         
         getline(input_string, temp_string, ',');
         float inflation_rate = stof(temp_string); 
@@ -437,9 +440,8 @@ float Calculate_Value(float principal, int year, int current_year, string& path)
     return principal;
 }
 
-
-
 void Exit_Protocol(){
     cout<<"Thank you for letting us serve you. Toodles!"<<endl;
+    Sleep(1000); //Delay for 1 second
     abort(); //Exit the program
 }
