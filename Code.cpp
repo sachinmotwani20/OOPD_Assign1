@@ -13,8 +13,8 @@ using namespace std;
 
 int main(){
     //Variable declarations
-    string original_path="D:\\OOPD\\Assig1\\Data\\india_data.csv"; //Path of the original csv file 
-    string path="D:\\OOPD\\Assig1\\Data\\india_data_modified.csv"; //Path of the modified csv file
+    string original_path="Data\\india_data.csv"; //Path to the original csv file 
+    string path="Data\\india_data_modified.csv"; //Path to store the modified csv file
     float principal=0, amount=0, value=0, interest=0;
     int year=1960, current_year=2023, choice=1;
     bool should_continue=true;

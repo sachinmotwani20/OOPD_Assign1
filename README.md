@@ -13,11 +13,7 @@ g++ Code.cpp -o Code
 .\Code
 
 ## Before running the commands
-S1: Open code.cpp
-
-S2: Update two variables, namely *original_path* & *path*.
-*  *original_path*: path to the original *India_data.csv*
-*  *path*: path (with name) to store the modified *India_data.csv* file [This is useful for internal functionality]
+Ensure that the "Data" Folder is in the same directory as the Code.cpp file. 
 
 
 ### References:
