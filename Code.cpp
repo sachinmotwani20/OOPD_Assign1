@@ -1,23 +1,26 @@
-/*Software to estimate the value of money invested at any point of time beyond 1960: Compound Interest*/
+/*Software to estimate the value of money invested at any point of time beyond 1960*/
 
 #include <iostream> //To use cout and cin
 #include <string> //To use string
 #include <fstream> //To read from file
 #include <sstream> //To use stringstream
+#include <cmath> //To use pow()
 #include <iomanip> //To use setprecision
 #include <limits> //To use numeric_limits
 #include <cctype> //To use isdigit()
-#include <windows.h> //To use Sleep() in windows 
+#include <windows.h> //To use delay() in windows [Alternative: #include <unistd.h> for linux]
 
 using namespace std;
 
 int main(){
     //Variable declarations
-    string original_path="Data\\india_data.csv"; //Path to the original csv file 
-    string path="Data\\india_data_modified.csv"; //Path to store the modified csv file
+    string original_path="Data\\spain_data.csv";
+    string path="Data\\spain_data_modified.csv";
+    string currency="Peseta";
     float principal=0, amount=0, value=0, interest=0;
     int year=1960, current_year=2023, choice=1;
     bool should_continue=true;
+
 
 
     //Function declarations/prototypes
@@ -25,24 +28,25 @@ int main(){
     int Get_Valid_Choice();
     void Remove_Header_Row(string&, string&);
     void Print_Interest_and_Inflation_Rate(string&);
-    void Take_Inputs(float&, int&, int&, bool&);
+    void Take_Inputs(float&, int&, int&, string&, bool&);
     bool Is_Valid_Principal(string&);
-    float Get_Valid_Principal();
+    float Get_Valid_Principal(string&);
     bool Is_Valid_Year(string&);
     int Get_Valid_Year();
+    void Update_Currency_and_Principal(int, string&, float&);
     void Update_Current_Year(int&);
     float Get_Interest_Rate(int, string&);
-    float Calculate_Amount(float, int, int, string&);
+    float Calculate_Amount(float, int, int, string&, string&);
     float Get_Inflation_Rate(int, string&);
-    float Calculate_Value(float, int, int, string&);
+    float Calculate_Value(float, int, int, string&, string&);
     void Exit_Protocol();
-    
+    void Compare_Growth_Rate(string&, string&);
 
     restart: //Label to restart the program
     
     Sleep(1000); //Delay for 1 second
     cout<<"-------------------------------------------------"<<endl;
-    cout<<"Welcome to Indian Bank Investment Software"<<endl;
+    cout<<"Welcome to Spanish Bank Investment Software"<<endl;
     cout<<"-------------------------------------------------"<<endl;
     cout<<"What would you like to do?"<<endl;
     cout<<"1. View changing Interest and Inflation Rates for your country between 1960 & 2022"<<endl;
@@ -50,6 +54,7 @@ int main(){
     cout<<"3. Calculate the value [amount with inflation adjustment] of money received as of the current year ("<<current_year<<")"<<endl;
     cout<<"4. Both 2 and 3"<<endl;
     cout<<"5. Change current year"<<endl;
+    cout<<"6. Compare growth rate of money between Dictatorship and Monarchy"<<endl;
     choice = Get_Valid_Choice();
 
     switch (choice)    {
@@ -57,35 +62,37 @@ int main(){
             Print_Interest_and_Inflation_Rate(path); // Print all interest and inflation rates
             cout<<"Changing Interest and Inflation Rates have been printed."<<endl;
             Exit_Protocol(); // Exit the program
-    case 2: Take_Inputs(principal, year, current_year, should_continue); // Take inputs from the user
+    case 2: Take_Inputs(principal, year, current_year, currency, should_continue); // Take inputs from the user
             if (should_continue==false){goto restart;} //Restart the program
             Remove_Header_Row(original_path, path); // Remove header row from the csv file
-            amount = Calculate_Amount(principal, year, current_year, path); // Calculate amount without inflation adjustment
+            amount = Calculate_Amount(principal, year, current_year, currency, path); // Calculate amount without inflation adjustment
             cout.setf(ios::fixed); //To set the precision after the decimal point
-            cout<<"Amount (INR) received: "<<setprecision(2)<<amount<<endl;
-            cout<<"Interest (INR) received on amount: "<<setprecision(2)<<(amount - principal)<<endl;
+            cout<<"Amount received: "<<setprecision(2)<<amount<<" "<<currency<<endl;
+            cout<<"Interest received on amount: "<<setprecision(2)<<(amount - principal)<<" "<<currency<<endl;
             Exit_Protocol(); // Exit the program
-    case 3: Take_Inputs(principal, year, current_year, should_continue); // Take inputs from the user
+    case 3: Take_Inputs(principal, year, current_year, currency, should_continue); // Take inputs from the user
             if (should_continue==false){goto restart;} //Restart the program
             Remove_Header_Row(original_path, path); // Remove header row from the csv file
-            value = Calculate_Value(principal, year, current_year, path); // Calculate value with inflation adjustment
+            value = Calculate_Value(principal, year, current_year, currency, path); // Calculate value with inflation adjustment
             cout.setf(ios::fixed); //To set the precision after the decimal point
-            cout<<"Value (INR) received: "<<setprecision(2)<<value<<endl;
-            cout<<"Interest (INR) received on value: "<<setprecision(2)<<(value - principal)<<endl;
+            cout<<"Value received: "<<setprecision(2)<<value<<" "<<currency<<endl;
+            cout<<"Interest received on value: "<<setprecision(2)<<(value - principal)<<" "<<currency<<endl;
             Exit_Protocol(); // Exit the program
-    case 4: Take_Inputs(principal, year, current_year, should_continue); // Take inputs from the user
+    case 4: Take_Inputs(principal, year, current_year,  currency, should_continue); // Take inputs from the user
             if (should_continue==false){goto restart;} //Restart the program
             Remove_Header_Row(original_path, path); // Remove header row from the csv file
-            amount = Calculate_Amount(principal, year, current_year, path); // Calculate amount without inflation adjustment
-            value = Calculate_Value(principal, year, current_year, path); // Calculate value with inflation adjustment
+            amount = Calculate_Amount(principal, year, current_year, currency, path); // Calculate amount without inflation adjustment
+            value = Calculate_Value(principal, year, current_year, currency, path); // Calculate value with inflation adjustment
             cout.setf(ios::fixed); //To set the precision after the decimal point
-            cout<<"Amount (INR) received: "<<setprecision(2)<<amount<<endl;
-            cout<<"Interest (INR) received on amount: "<<setprecision(2)<<(amount - principal)<<endl;
-            cout<<"Value (INR) received: "<<setprecision(2)<<value<<endl;
-            cout<<"Interest (INR) received on value: "<<setprecision(2)<<(value - principal)<<endl;
+            cout<<"Amount received: "<<setprecision(2)<<amount<<" "<<currency<<endl;
+            cout<<"Interest received on amount: "<<setprecision(2)<<(amount - principal)<<" "<<currency<<endl;
+            cout<<"Value received: "<<setprecision(2)<<value<<" "<<currency<<endl;
+            cout<<"Interest received on value: "<<setprecision(2)<<(value - principal)<<" "<<currency<<endl;
             Exit_Protocol(); // Exit the program
     case 5: Update_Current_Year(current_year); // Update current year
             goto restart; //Restart the program
+    case 6: Compare_Growth_Rate(currency, path); // Compare growth rate
+            Exit_Protocol(); // Exit the program
     default:
         cout<<"Invalid choice."<<endl;
         Exit_Protocol(); // Exit the program
@@ -93,6 +100,10 @@ int main(){
 
     return 0;
 }
+
+
+
+
 
 
 
@@ -127,7 +138,7 @@ bool Is_Valid_Choice(string& input){
     }
 
     int value = stoi(input);
-    return ((value > 0) && (value<6)); // Check if value is greater than 0 and less than 6
+    return ((value > 0) && (value<7)); // Check if value is greater than 0 and less than 4
 
 }
 
@@ -142,7 +153,7 @@ int Get_Valid_Choice(){
         if (Is_Valid_Choice(choice)) {
             return stoi(choice);
         } else {
-            cout << "Invalid input. Please enter a valid choice in digits (between 1 & 5) only." << endl;
+            cout << "Invalid input. Please enter a valid choice in digits (between 1 & 6) only." << endl;
         }
     }
 }
@@ -189,7 +200,7 @@ void Print_Interest_and_Inflation_Rate(string& path){
 
     string row; //To store the row read from the file
     while (getline(input_file, row)) { 
-
+        // cout<<"came inside loop"<<endl;
         int serial_no, year;
         string temp_string=""; //Empty string for temporarily storing non-string data types
 
@@ -217,8 +228,6 @@ void Print_Interest_and_Inflation_Rate(string& path){
 }
  
 
-
-
 bool Is_Valid_Principal(string& input) {
 
     int decimal_count = 0; //For checking more than 1 decimal point
@@ -231,20 +240,20 @@ bool Is_Valid_Principal(string& input) {
             decimal_count++;
             if (decimal_count > 1) {
                 cout<<"More than one decimal point found."<<endl;
-                return false; 
+                return false; // More than one decimal point
             }
         } else if (c == '-') {
             cout<<"Negative principal amount found."<<endl;
-            return false;       
+            return false; // Negative principal amount      
         } else {
             cout<<"Invalid character(s) found."<<endl;
-            return false; 
+            return false; // Invalid character found
         }
     }
 
     if (!digit_found) {
         cout<<"No digits found."<<endl;
-        return false; 
+        return false; // No digits found
     }
 
     float value = stof(input);
@@ -252,10 +261,10 @@ bool Is_Valid_Principal(string& input) {
 }
 
 
-float Get_Valid_Principal() {
+float Get_Valid_Principal(string& currency) {
     string invested_amount;
     while (true) {
-        cout << "Amount (INR) invested: ";
+        cout << "Amount invested ("<<currency<<"): ";
         getline(cin, invested_amount); 
         /*getline() is used to read the entire line of input, including spaces and newline characters. 
         Unlike cin, it does not skip whitespace characters.*/
@@ -314,24 +323,30 @@ int Get_Valid_Year() {
     }
 }
 
-void Take_Inputs(float& principal, int& year, int& current_year, bool& should_continue){
+
+
+void Take_Inputs(float& principal, int& year, int& current_year, string& currency, bool& should_continue){
     cout<<"------------------------------------------------"<<endl;
     cout<<"Please enter the following details"<<endl;
-    principal = Get_Valid_Principal(); // Get valid principal amount
+
     year = Get_Valid_Year(); // Get valid year of investment
     if (year>current_year){
         cout<<"Year of investment cannot be greater than current year."<<endl;
         should_continue = false;
     }
     else if (year==current_year){
-        cout<<"Year of investment is equal to current year."<<endl;
-        cout<<"Amount (INR) received: "<<principal<<endl;
+        currency = "Euro";
+        principal = Get_Valid_Principal(currency); // Get valid principal amount
+        cout<<"Year of investment is equal to the current year."<<endl;
+        cout<<"Amount received: "<<principal<<" "<<currency<<endl;
         cout<<"No interest received."<<endl;
         should_continue = false;
     }
     else{
+        currency = {year<2002 ? "Peseta" : "Euro"}; //If year is less than 2002, currency is Peseta. Else, it is Euro.
+        principal = Get_Valid_Principal(currency); // Get valid principal amount
         cout<<"------------------------------------------------"<<endl;
-        cout<<"Amount (INR) invested: "<<principal<<endl;
+        cout<<"Amount Invested: "<<principal<<" "<<currency<<endl;
         cout<<"Year of Investment: "<<year<<endl;
         cout<<"Current year: "<<current_year<<endl;
         should_continue = true;
@@ -348,12 +363,12 @@ void Update_Current_Year(int& current_year){
 
         if (new_year=="2023"){
             current_year = 2023;
-            cout<<"Current year updated to "<<current_year<<endl;
+            // cout<<"Current year updated to "<<current_year<<endl;
             break;
         }
         else if (Is_Valid_Year(new_year)) {
             current_year = stoi(new_year);
-            cout<<"Current year updated to "<<current_year<<endl;
+            // cout<<"Current year updated to "<<current_year<<endl;
             break;
         } else {
             cout << "Invalid input." << endl;
@@ -373,13 +388,13 @@ float Get_Interest_Rate(int year, string& path){
         stringstream input_string(row); //To parse the data read into the string
         
         getline(input_string, temp_string, ','); 
-        serial_no = stoi(temp_string); 
+        serial_no = stoi(temp_string); //stoi() converts string to int
         
         getline(input_string, temp_string, ',');
         temp_year = stoi(temp_string); 
 
         getline(input_string, temp_string, ',');
-        float interest_rate = stof(temp_string); 
+        float interest_rate = stof(temp_string); //stof() converts string to float
         
         getline(input_string, temp_string, ',');
         float inflation_rate = stof(temp_string); 
@@ -392,33 +407,71 @@ float Get_Interest_Rate(int year, string& path){
     return 0;
 }
 
-float Calculate_Amount(float principal, int year, int current_year, string& path){
+void Update_Currency_and_Principal(int year, string& currency, float& principal){
+    if ((year<2002)&&(currency=="Peseta")){
+        ; //Do nothing
+    }
+    else if ((year<2002)&&(currency=="Euro")){
+        // cout<<"Currency changed to Peseta."<<endl;
+        currency = "Peseta";
+        principal = principal*166;
+    }
+    else if ((year>=2002)&&(currency=="Peseta")){
+        // cout<<"Currency changed to Euro."<<endl;
+        currency = "Euro";
+        principal = principal/166;
+    }
+    else if ((year>=2002)&&(currency=="Euro")){
+        ; //Do nothing
+    }
+    else{
+        cout<<"Invalid year."<<endl;
+    }
+}
+
+void Update_Principal_to_desired_Currency(string original_currency, string current_currency, float& principal){
+    if ((original_currency=="Peseta")&&(current_currency=="Euro")){
+        principal = principal*166;
+    }
+    else if ((original_currency=="Euro")&&(current_currency=="Peseta")){
+        principal = principal/166;
+    }
+    else{
+        ; //Do nothing
+    }
+}
+
+float Calculate_Amount(float principal, int year, int current_year, string& currency, string& path){
+    string original_currency = currency;
     for (int i=year; i<current_year; i++){
         float interest_rate = Get_Interest_Rate(i, path);
+        Update_Currency_and_Principal(i, currency, principal);
         principal = principal*(1+(interest_rate/100));
     }
+    Update_Principal_to_desired_Currency(original_currency, currency, principal);
+    currency = original_currency;
     return principal;
 }
 
 float Get_Inflation_Rate(int year, string& path){
-    ifstream input_file; 
-    input_file.open(path); 
+    ifstream input_file; //Create an input file stream
+    input_file.open(path); //Open the file
     
-    string row; 
+    string row; //To store the row read from the file
     while (getline(input_file, row)) { 
         int serial_no, temp_year;
-        string temp_string=""; 
+        string temp_string=""; //Empty string for temporarily storing non-string data types
 
-        stringstream input_string(row); 
+        stringstream input_string(row); //To parse the data read into the string
         
         getline(input_string, temp_string, ','); 
-        serial_no = stoi(temp_string); 
+        serial_no = stoi(temp_string); //stoi() converts string to int
         
         getline(input_string, temp_string, ',');
         temp_year = stoi(temp_string); 
 
         getline(input_string, temp_string, ',');
-        float interest_rate = stof(temp_string); 
+        float interest_rate = stof(temp_string); //stof() converts string to float
         
         getline(input_string, temp_string, ',');
         float inflation_rate = stof(temp_string); 
@@ -431,17 +484,41 @@ float Get_Inflation_Rate(int year, string& path){
     return 0;
 }
 
-float Calculate_Value(float principal, int year, int current_year, string& path){
+float Calculate_Value(float principal, int year, int current_year,  string& currency, string& path){
+    string original_currency = currency;
     for (int i=year; i<current_year; i++){
         float interest_rate = Get_Interest_Rate(i, path);
         float inflation_rate = Get_Inflation_Rate(i, path);
+        Update_Currency_and_Principal(i, currency, principal);
         principal = principal*(1+((interest_rate-inflation_rate)/100));
     }
+    Update_Principal_to_desired_Currency(original_currency, currency, principal);
+    currency = original_currency;
     return principal;
 }
+
+
 
 void Exit_Protocol(){
     cout<<"Thank you for letting us serve you. Toodles!"<<endl;
     Sleep(1000); //Delay for 1 second
     abort(); //Exit the program
+}
+
+
+
+void Compare_Growth_Rate(string& currency, string& path){
+    int dict_start=1960, dict_end=1977, mon_start=1978, mon_end=2023, principal_amount=100000;
+    cout<<"------------------------------------------------"<<endl;
+    cout<<"Comparing growth rate of money between Dictatorship and Monarchy"<<endl;
+    Sleep(1000); //Delay for 1 second
+    cout<<"Duration of Constitutional-Dictatorship: "<<dict_end-dict_start<<" years "<<endl;
+    cout<<"Duration of Constitutional-Monarchy: "<<mon_end-mon_start<<" years "<<endl;
+    cout<<"Let "<<principal_amount<<" "<<currency<<"s were invested for the entire duration of each government type."<<endl;
+    cout<<"Normalized value [amount with inflation adjustment] at the end of each government type is calculated & given by"<<endl;
+    float dict_value = ((Calculate_Value(principal_amount, dict_start, dict_end, currency, path))/(dict_end-dict_start));
+    float mon_value = ((Calculate_Value(principal_amount, mon_start, mon_end, currency, path))/(mon_end-mon_start));
+    cout<<"Constitutional Dictatorship: "<<dict_value<<" "<<currency<<endl;
+    cout<<"Constitutional Monarchy: "<<mon_value<<" "<<currency<<endl;
+    cout<<"Since the normalized value of money is greater for Constitutional Dictatorship, the money grew faster during that reign."<<endl;
 }

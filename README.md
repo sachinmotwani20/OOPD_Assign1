@@ -1,7 +1,7 @@
-# OOPD_Assign1: Q1
+# OOPD_Assign1: Q2
 This is a repository containing files for OOPD Assignment 1.
 
-This branch is particularly dedicated to Q1 pertaining to the data for Indian banks.
+This branch is particularly dedicated to Q2 pertaining to the data from Spanish banks.
 
 The code was prepared using Windows System with VS Code.
 
@@ -13,7 +13,7 @@ g++ Code.cpp -o Code
 .\Code
 
 ## Before running the commands
-Ensure that the "Data" Folder is in the same directory as the Code.cpp file. 
+Ensure that the "Data" Folder is in the same directory as the Code.cpp file.
 
 
 ### References:
